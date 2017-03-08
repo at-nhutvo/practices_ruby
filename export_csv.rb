@@ -1,7 +1,22 @@
 class Export_AT
 	def initialize f_source, f_des = ''
 		@f_source = f_source
-		@f_des    = f_des
+		if f_des.empty?
+			time = Time.now
+			@f_des = time.strftime('%Y%m%d%H%M%S') + '.xls'
+		else
+			validate_filename(f_des)
+		end
+	end
+
+	def validate_filename(f_des)
+		accept_format = [".xls"]
+		if accept_format.include? File.extname(f_des)
+			@f_des = f_des
+		else
+			puts "Invalid Format File"
+			exit
+		end
 	end
 
 	def file_exists
@@ -21,7 +36,7 @@ class Export_AT
 		end
 	end
 
-	def order(data, order_by = 0, pos = 'asc')
+	def sort_order(data, order_by = 0, pos = 'asc')
 		if pos == 'asc'
 			data = data.sort{ |a,b| a[order_by] <=> b[order_by] }
 		else
@@ -30,11 +45,39 @@ class Export_AT
 		return data
 	end
 
+	def add_row(data, csv)
+		write = nil
+		data.each do |item|
+			year = get_year(item[2])
+			year = (Time.new.year - year).to_s
+
+			item.push(year)
+			write = csv << item.map!(&:capitalize)
+		end
+		puts write ? 'Great! Create file csv successfully!' : 'Opps! Create file csv failed!'
+
+	end
+
+	def get_year(date)
+		regex = /^[0-9]{2}+-[0-9]{2}+-[0-9]{4}/
+		d = "#{date}".match(regex)
+		if d.nil?
+			puts "Invalid Format Date"
+		else
+			d = d.to_s
+			return d[-4..-1].to_i
+		end
+	end
+
+	def add_columns(columns, csv)
+		csv << columns # Add Column
+	end
+
 	def do_export_csv(*columns)
 		require 'csv'
 		CSV.open(@f_des, 'w+') do |csv|
 			
-			csv << columns # Add Column
+			add_columns(columns, csv)
 
 			# Doc du lieu tu file txt, sau do luu DL vao mang
 			data = Array.new
@@ -44,21 +87,15 @@ class Export_AT
 			end
 
 			# Sort data
-			data = order(data, 3) 
+			data = sort_order(data, 3) 
 			
-			# Add row 
-			write = nil
-			data.each do |a|
-				write = csv << a.map!(&:capitalize)
-			end
-			puts write ? 'Great! Create file csv successfully!' : 'Opps! Create file csv failed!'
-
+			# Add row
+			add_row(data, csv)
 		end
 	end
 end
 
 f_source = 'data_master.txt'
-f_des    = 'users.xls'
+file = Export_AT.new(f_source)
+file.do_export_csv("ID", "Fullname", "Birthday", "Team", "Yearsold")
 
-file = Export_AT.new(f_source, f_des)
-file.do_export_csv("ID", "Fullname", "Birthday", "Team")

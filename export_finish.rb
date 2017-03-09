@@ -62,19 +62,17 @@ class Export
 
 	def do_export
 		# TODO: Export file
-		CSV.open(filename, 'w') do |csv|
+		CSV.open(filename, 'w') do |file|
 			# Add columns
-			csv << @columns
+			file << @columns
 
 			# Sort data
 			data = sort_order(@data, 3) 
 
 			# Add row
-			data.each do |row|
-				csv << row
-			end
-			puts 'Great! Create file csv successfully!'
+			data.each { |row| file << row}
 		end
+		puts 'Great! Create file csv successfully!'
 		rescue
 			HandleError.not_write_file
 	end

@@ -1,8 +1,7 @@
 module ReadFile
 	def read_data(source)
-		source = valid_source(source)
-		exit
-		lines = File.readlines(source)
+		file = validate_source(source)
+		lines = File.readlines(file)
 
 		# Transfer data to array
 		data = []
@@ -14,17 +13,19 @@ module ReadFile
 		return data
 	end
 
-	def valid_source(source)
+	def validate_source(source)
 		include HandleError
+
 		# TODO: Check exists file
 		raise "Not Found" unless File.exists?(source)
 		rescue
 			HandleError.not_found
 		else
-			# source
-			puts "cc"
+			source
 	end
 
+	private
+	
 	def calculate_age(string)
 		include HandleError
 

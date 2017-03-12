@@ -13,17 +13,16 @@ class Database
 
 	def affected_rows; @db.affected_rows end
 
-	def set_table(table); @table = table end
 
-	def select(str = '*', where = '')
+	def select(table, str = '*', where = '')
 		if where.size != 0
-			@db.query("SELECT #{str} FROM #{@table} WHERE #{where}")
+			@db.query("SELECT #{str} FROM #{table} WHERE #{where}")
 		else
-			@db.query("SELECT #{str} FROM #{@table}")
+			@db.query("SELECT #{str} FROM #{table}")
 		end
 	end
 
-	def insert(array)
+	def insert(table, array)
 		begin 
 			raise "Data must is hash" unless array.is_a?(Hash)
 			columns = ''
@@ -35,15 +34,15 @@ class Database
 			# trim comma
 			columns = columns.chomp(',')
 			values= values.chomp(',')
-			query = "INSERT INTO #{@table}(#{columns}) VALUES(#{values})"
-			res = @db.query(query)
+			query = "INSERT INTO #{table}(#{columns}) VALUES(#{values})"
+			@db.query(query)
 			affected_rows ? @db.last_id : false
 		rescue Exception => msg
 			puts msg
 		end
 	end
 
-	def update(data, where = '')
+	def update(table, data, where = '')
 		begin 
 			raise "Data must is hash" unless data.is_a?(Hash)
 			data = ''
@@ -53,20 +52,26 @@ class Database
 			# trim comma
 			data = data.chomp(',')
 			if where.size != 0
-				query = "UPDATE #{@table} SET #{data} WHERE #{where}"
+				query = "UPDATE #{table} SET #{data} WHERE #{where}"
 			else
-				query = "UPDATE #{@table} SET #{data}"
+				query = "UPDATE #{table} SET #{data}"
 			end
-			res = @db.query(query)
+			@db.query(query)
 			affected_rows ? @db.last_id : false
 		rescue Exception => msg
 			puts msg
 		end
 	end
 
-	def delete(where)
+	def delete(table, where)
 		where = where.is_a?(Integer) ? "id = #{where}" : where
-		query = "DELETE FROM #{@table} WHERE #{where}"
+		query = "DELETE FROM #{table} WHERE #{where}"
+		@db.query(query)
+		affected_rows ? true : false
+	end
+
+	def do_query(str)
+		@db.query(str)
 		affected_rows ? true : false
 	end
 end

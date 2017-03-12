@@ -7,6 +7,7 @@ module ReadFile
 		data = []
 		lines.each do |line|
 			item = line.chomp.split('/')
+			calculate_age(item[2])
 			item << calculate_age(item[2])
 			data << item
 		end
@@ -14,27 +15,26 @@ module ReadFile
 	end
 
 	def validate_source(source)
-		include HandleError
-
-		# TODO: Check exists file
-		raise "Not Found" unless File.exists?(source)
-		rescue
-			HandleError.not_found
-		else
+		begin
+			raise "Source Not Found" unless File.exists?(source)
 			source
+			rescue Exception => e
+				puts e; exit
+		end
 	end
 
 	private
-	
-	def calculate_age(string)
-		include HandleError
 
-		Date.parse(string) 
-		rescue
-			HandleError.invalid_date
-		else
+	def calculate_age(string)
+		begin
+			Date.parse(string) 
 			year_birthday = Date.parse(string).year
 			year_current  = Time.now.year
 			year_current - year_birthday
+		rescue Exception => e
+			puts e
+			exit
+		end
 	end
+
 end

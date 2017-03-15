@@ -1,8 +1,9 @@
 # Setup
-require 'csv'
 require_relative "core/DB"
 require_relative "config/config"
-require_relative "module/read_file"
-require_relative "controller/user_controller"
+require_relative "module/template"
+require_relative "model/user"
+require_relative "controller/atm_controller"
 
-UserController.new.run
+atm = ATMController.new
+atm.run

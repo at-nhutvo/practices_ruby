@@ -62,8 +62,7 @@ class Database
 	end
 
 	def delete(table, condition)
-		condition = condition.is_a?(Integer) ? "id = #{condition}" : condition
-		query = "DELETE FROM #{table} WHERE #{condition}"
+		query = "DELETE FROM #{table} WHERE id IN (#{condition})"
 		@db.query(query)
 		@db.affected_rows ? true : false
 	end
